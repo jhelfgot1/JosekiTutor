@@ -1,9 +1,19 @@
 .Board {
-  margin: auto;
-  margin-top: 10px;
-
-  width: 95vmin;
-  height: 95vmin;
+  margin: 0;
+  left: 0;
+  width: 100vmin;
+  height: 100vmin;
   display: block;
   position: relative;
+}
+
+@media (orientation: portrait) {
+  .Board {
+    max-height: 70vh;
+    position: relative;
+    margin-top: 0;
+    width: 100vmin;
+    max-width: 70vh;
+    height: 100vmin;
+  }
 }

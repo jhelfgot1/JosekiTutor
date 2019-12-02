@@ -4,6 +4,7 @@ import "./Board.css";
 import backgroundImage from "./woodgrain.jpg";
 import Intersection from "./Intersection";
 import CheckMap from "./CheckMap";
+import JosekiController from "./Joseki/JosekiController";
 
 class Board extends Component {
   state = {};
@@ -25,6 +26,7 @@ class Board extends Component {
     this.whiteStones = [];
     this.blackStones = [];
     this.checkMap = new CheckMap();
+    this.josekiController = new JosekiController();
 
     this.hoveredStone = null;
     this.canvas = null;
@@ -37,7 +39,7 @@ class Board extends Component {
     this.backgroundImageRef = React.createRef();
     this.containingDivRef = React.createRef();
 
-    this.gridOffset = 1 / 20;
+    this.gridOffset = 1 / 18;
 
     for (let i = 0; i <= 18; i++) {
       this.stones.push([]);
@@ -62,8 +64,84 @@ class Board extends Component {
       const gridSide = this.canvas.width * (1 - 2 * this.gridOffset);
 
       this.ctx.lineWidth = 2;
+      this.ctx.font = "15px Arial";
+      const textOffset = 5;
+
+      this.ctx.fillText(
+        "A",
+        Math.round(xOffset - textOffset),
+        Math.round(yOffset / 2)
+      );
+      this.ctx.fillText(
+        "A",
+        Math.round(xOffset - textOffset),
+        Math.round(gridSide + 1.8 * yOffset)
+      );
+
+      this.ctx.fillText(
+        "T",
+        Math.round(gridSide + xOffset - textOffset),
+        Math.round(yOffset / 2)
+      );
+      this.ctx.fillText(
+        "T",
+        Math.round(gridSide + xOffset - textOffset),
+        Math.round(gridSide + 1.8 * yOffset)
+      );
+
+      this.ctx.fillText(
+        "19",
+        Math.round(xOffset / 8),
+        Math.round(yOffset + textOffset)
+      );
+      this.ctx.fillText(
+        "19",
+        Math.round(gridSide + xOffset * 1.5),
+        Math.round(yOffset + textOffset)
+      );
+
+      this.ctx.fillText(
+        "1",
+        Math.round(xOffset / 8),
+        Math.round(gridSide + yOffset + textOffset)
+      );
+      this.ctx.fillText(
+        "1",
+        Math.round(gridSide + xOffset * 1.5),
+        Math.round(gridSide + yOffset + textOffset)
+      );
+
       for (let i = 1; i <= 17; i++) {
+        let charCode = 0;
+        if (i >= 8) {
+          charCode = 66 + i;
+        } else {
+          charCode = 65 + i;
+        }
         let increment = i * gridSide * (1 / 18);
+        this.ctx.fillText(
+          String.fromCharCode(charCode),
+          Math.round(xOffset + increment - textOffset),
+          Math.round(yOffset / 2)
+        );
+        this.ctx.fillText(
+          String.fromCharCode(charCode),
+          Math.round(xOffset + increment - textOffset),
+          Math.round(gridSide + 1.8 * yOffset)
+        );
+
+        this.ctx.fillText(
+          (19 - i).toString(),
+          xOffset / 8,
+          yOffset + increment + textOffset
+        );
+
+        this.ctx.fillText(
+          (19 - i).toString(),
+          gridSide + xOffset * 1.5,
+          yOffset + increment + textOffset
+        );
+
         this.ctx.moveTo(Math.round(xOffset + increment), Math.round(yOffset));
         this.ctx.lineTo(
           Math.round(xOffset + increment),
@@ -78,6 +156,25 @@ class Board extends Component {
         );
         this.ctx.stroke();
       }
+
+      //draw star points
+
+      const starPoints = [
+        new Intersection(3, 3),
+        new Intersection(9, 3),
+        new Intersection(15, 3),
+        new Intersection(3, 9),
+        new Intersection(9, 9),
+        new Intersection(15, 9),
+        new Intersection(3, 15),
+        new Intersection(9, 15),
+        new Intersection(15, 15)
+      ];
+
+      starPoints.map(intersection => {
+        const canvasCoords = this.intersectionToCanvasCoords(intersection);
+        this.drawDot(canvasCoords);
+      });
 
       this.ctx.stroke();
     };
@@ -103,6 +200,11 @@ class Board extends Component {
     }
   };
 
+  drawDot = ({ x, y }) => {
+    this.ctx.beginPath();
+    this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
+    this.ctx.fill();
+  };
   reDrawCanvas = () => {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawInitialBoard();
