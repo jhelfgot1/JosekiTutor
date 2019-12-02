@@ -271,8 +271,6 @@ class Board extends Component {
   };
 
   captureStones = intersection => {
-    this.checkMap.clearCheckMap();
-
     const enemyColor =
       this.stones[intersection.x][intersection.y] == this.players.BLACK
         ? this.players.WHITE
@@ -283,6 +281,7 @@ class Board extends Component {
     });
 
     adjacentEnemies.map(enemy => {
+      this.checkMap.clearCheckMap();
       let libertyFound = false;
       if (!this.checkMap.needToCheck(enemy)) {
         return;
